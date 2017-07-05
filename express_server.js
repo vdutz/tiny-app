@@ -1,10 +1,12 @@
 var express = require("express");
+var cookieParser = require('cookie-parser')
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.use(cookieParser())
 
 app.set("view engine", "ejs");
 
@@ -37,7 +39,12 @@ app.get("/hello", (req, res) => {
 //   res.json(urlDatabase);
 // });
 
-
+app.post("/login", (req, res) => {
+  var username = req.body.username
+  console.log(username)
+  res.cookie('username', username)
+  res.redirect("/urls");
+})
 
 app.get("/urls", (req, res) => {
   let templateVars = {urls: urlDatabase};
