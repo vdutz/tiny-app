@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <% include ../partials/_header %>
+
+</head>
+
+<body>
+    <h4> The current URLs and their shortened codes are listed below:</h4>
+
+    <ul>
+    <!-- Add your EJS code here -->
+        <% for (key in urls) { %>
+            <li><%= urls[key] %> - <%= key %></li>
+            <br>
+            <form method="POST" action="/urls/<%= key %>/delete">
+                <a href="/urls/<%= key %>">Edit</a>
+                &nbsp; &nbsp; &nbsp;
+                <input type="submit" value="Delete this URL shortener">
+            </form>
+            <br><br>
+        <% }; %>
+    </ul>
+    <br>
+    <p>Click <a href="http://localhost:8080/urls/new">HERE</a> to shorten a new URL</p>
+
+</body>
+
+</html>
