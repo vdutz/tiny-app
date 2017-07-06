@@ -82,6 +82,10 @@ app.post("/register", (req, res) => {
 
 })
 
+app.get("/login", (req, res) => {
+  res.render("login")
+})
+
 app.post("/login", (req, res) => {
   var username = req.body.username
   console.log(username)
@@ -96,16 +100,16 @@ app.post("/logout", (req, res) => {
 })
 
 app.get("/urls", (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    username:req.cookies["username"]
-  };
+  templateVars = {
+      urls: urlDatabase,
+      user: users[req.cookies["user_id"]]
+    };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username:req.cookies["username"]
+   user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
 });

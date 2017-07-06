@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <title>My TinyURL App</title>
 
-<% if (username) { %>
-  Hello, <%= username %>
+<% if (user && user.id) { %>
+  Hello, <%= user.id %>
   <form method="POST" action="/logout">
     <input type="submit" value="Logout">
   </form>
@@ -15,5 +15,8 @@
         <input type="submit" value="Submit Username">
     </form>
 <% }; %>
+
+
+
 
 
