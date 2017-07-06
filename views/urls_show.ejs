@@ -13,7 +13,7 @@
 
     <ul>
     <!-- Add your EJS code here -->
-        <li><%= urls[shortURL]%> - <%= shortURL %></li>
+        <li><%= urls[shortURL]["longURL"] %> - <%= shortURL %></li>
         <br>
         <form method="POST" action="/urls/<%= shortURL %>">
           <input type="text" name="newLongURL" value="http://">
