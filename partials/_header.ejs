@@ -4,17 +4,10 @@
 <meta charset="UTF-8">
 <title>My TinyURL App</title>
 
-<% if (user && user.id) { %>
-  Hello, <%= user.id %>
-  <form method="POST" action="/logout">
-    <input type="submit" value="Logout">
-  </form>
-<% } else { %>
-    <form method="POST" action="/login">
-        <input type="text" name="username" placeholder="Input Username Here">
-        <input type="submit" value="Submit Username">
-    </form>
-<% }; %>
+<a href="/register">Register</a> &nbsp; &nbsp; &nbsp;
+<a href="/login">Login</a>
+
+
 
 
 

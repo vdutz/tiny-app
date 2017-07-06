@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head></head>
+  <meta charset="UTF-8">
+  <title>My TinyURL App</title>
+
+  <% include ../partials/_header %>
+
+  <body style="font-size:20px; padding:50px;">
+
+    <% if (user && user.id) { %>
+      Hello, <%= user.id %>
+      <form method="POST" action="/logout">
+        <input type="submit" value="Logout">
+      </form>
+    <% } else { %>
+        <form action="/login" method="POST" style="margin:150px;">
+          <!-- <label for="longURL">Enter a URL:</label> -->
+          Email: <input type="email" name="email" value="" style="width: 300px">
+          Password: <input type="password" name="password" value="" style="width: 300px">
+          <br> <br>
+          <input type="submit" value="Submit">
+        </form>
+    <% }; %>
+
+  </body>
+</html>
