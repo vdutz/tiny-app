@@ -17,9 +17,14 @@
             <li><%= urls[key]["longURL"] %> - <%= key %></li>
             <br>
             <form method="POST" action="/urls/<%= key %>/delete">
-                <a href="/urls/<%= key %>">Edit</a>
-                &nbsp; &nbsp; &nbsp;
-                <input type="submit" value="Delete this URL shortener">
+                <% if (user && urls[key]["userID"] == user.id) { %>
+
+                    <a href="/urls/<%= key %>">Edit</a>
+                    &nbsp; &nbsp; &nbsp;
+                    <input type="submit" value="Delete this URL shortener">
+
+                <% } %>
+
             </form>
             <br><br>
         <% }; %>

@@ -15,10 +15,14 @@
     <!-- Add your EJS code here -->
         <li><%= urls[shortURL]["longURL"] %> - <%= shortURL %></li>
         <br>
-        <form method="POST" action="/urls/<%= shortURL %>">
-          <input type="text" name="newLongURL" value="http://">
-            <input type="submit" value="Update this URL">
-        </form>
+        <% if (user && urls[key]["userID"] == user.id) { %>
+
+            <form method="POST" action="/urls/<%= shortURL %>">
+              <input type="text" name="newLongURL" value="http://">
+                <input type="submit" value="Update this URL">
+            </form>
+
+        <% } %>
     </ul>
     <br>
     <p>Click <a href="#">HERE</a> to shorten a new URL</p>
