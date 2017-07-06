@@ -90,10 +90,29 @@ app.get("/login", (req, res) => {
 })
 
 app.post("/login", (req, res) => {
-  var username = req.body.username
-  console.log(username)
-  res.cookie('username', username)
-  res.redirect("/urls");
+  userID = ""
+  emailInUsers = false
+  for (key in users) {
+    if (users[key].email === req.body.email) {
+      userID = key
+      emailInUsers = true
+    }
+  }
+  if (!emailInUsers) {
+    res.status(403).send("Your email address does not match our records.")
+  } else {
+    if (users[userID].password === req.body.password) {
+      res.cookie('user_id', users[userID].id)
+      res.redirect("/")
+    } else {
+      res.status(403).send("Your password does not match your email address.")
+    }
+  }
+
+  // var username = req.body.username
+  // console.log(username)
+  // res.cookie('username', username)
+  // res.redirect("/urls");
 })
 
 app.post("/logout", (req, res) => {
