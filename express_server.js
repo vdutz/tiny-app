@@ -27,6 +27,19 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "abc123": {
+    id: "abc123",
+    email: "vlad@abc.com",
+    password: "purple"
+  },
+  "def456": {
+    id: "def456",
+    email: "mike@abc.com",
+    password: "blue"
+  }
+}
+
 app.get("/", (req, res) => {
   res.end("Hello!");
 });
@@ -35,9 +48,39 @@ app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
+
+app.get("/register", (req, res) => {
+  // let templateVars = {
+  //   username:req.cookies["username"]
+  // };
+  res.render('register')
+})
+
+app.post("/register", (req, res) => {
+  console.log("POST SUCCESFUL")
+
+  duplicateEmail = false
+  for (key in users) {
+    if (users[key].email == req.body.email) {
+      duplicateEmail = true
+    }
+  }
+  if (duplicateEmail == true) {
+    res.status(400).send("The email you entered already exists in our user database. Please refresh the page to try again.")
+  }
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send("The email or password you entered was blank.  Please refresh the page to try again.")
+  }
+
+  randomID = generateRandomString()
+  res.cookie('user_id', randomID)
+  users[randomID] = {id: randomID, email: req.body.email, password: req.body.password}
+  console.log(users)
+  // console.log(res.cookie[user_id])
+  res.redirect("/urls");
+
+
+})
 
 app.post("/login", (req, res) => {
   var username = req.body.username
