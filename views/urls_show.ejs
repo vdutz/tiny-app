@@ -15,7 +15,7 @@
     <!-- Add your EJS code here -->
         <li><%= urls[shortURL]%> - <%= shortURL %></li>
         <br>
-        <form method="POST" action="/urls/<%= key %>">
+        <form method="POST" action="/urls/<%= shortURL %>">
           <input type="text" name="newLongURL" value="http://">
             <input type="submit" value="Update this URL">
         </form>

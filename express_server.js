@@ -128,7 +128,7 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(404).send(`The short URL code you entered (${req.params.id}) does not exist.  Please try again.`)
   }
-  let templateVars = { shortURL: req.params.id, urls: urlDatabase, username: req.cookies["username"] };
+  let templateVars = { shortURL: req.params.id, urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
