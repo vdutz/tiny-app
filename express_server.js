@@ -50,10 +50,10 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-  // let templateVars = {
-  //   username:req.cookies["username"]
-  // };
-  res.render('register')
+  let templateVars = {
+   user: users[req.cookies["user_id"]]
+  };
+  res.render('register', templateVars)
 })
 
 app.post("/register", (req, res) => {
@@ -108,16 +108,10 @@ app.post("/login", (req, res) => {
       res.status(403).send("Your password does not match your email address.")
     }
   }
-
-  // var username = req.body.username
-  // console.log(username)
-  // res.cookie('username', username)
-  // res.redirect("/urls");
 })
 
 app.post("/logout", (req, res) => {
-  // var username = ""
-  res.clearCookie('username')
+  res.clearCookie('user_id')
   res.redirect("/urls");
 })
 
