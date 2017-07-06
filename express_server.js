@@ -6,6 +6,15 @@ var PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+const bcrypt = require('bcrypt');
+
+const hashed_purple = bcrypt.hashSync("purple", 10);
+console.log(hashed_purple)
+
+const hashed_blue = bcrypt.hashSync("blue", 10);
+console.log(hashed_blue)
+
+
 app.use(cookieParser())
 
 app.set("view engine", "ejs");
@@ -35,12 +44,12 @@ const users = {
   "abc123": {
     id: "abc123",
     email: "vlad@abc.com",
-    password: "purple"
+    password: hashed_purple
   },
   "def456": {
     id: "def456",
     email: "mike@abc.com",
-    password: "blue"
+    password: hashed_blue
   }
 }
 
@@ -82,7 +91,7 @@ app.post("/register", (req, res) => {
 
   randomID = generateRandomString()
   res.cookie('user_id', randomID)
-  users[randomID] = {id: randomID, email: req.body.email, password: req.body.password}
+  users[randomID] = {id: randomID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10)}
   console.log(users)
   // console.log(res.cookie[user_id])
   res.redirect("/urls");
@@ -109,7 +118,8 @@ app.post("/login", (req, res) => {
   if (!emailInUsers) {
     res.status(403).send("Your email address does not match our records.")
   } else {
-    if (users[userID].password === req.body.password) {
+    //if (users[userID].password === req.body.password) {
+    if (bcrypt.compareSync(req.body.password, users[userID].password)) {
       res.cookie('user_id', users[userID].id)
       res.redirect("/urls")
     } else {
