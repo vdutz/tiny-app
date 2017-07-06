@@ -9,10 +9,7 @@
   <body style="font-size:20px; padding:50px;">
 
     <% if (user && user.id) { %>
-      Hello, <%= user.id %>
-      <form method="POST" action="/logout">
-        <input type="submit" value="Logout">
-      </form>
+
     <% } else { %>
         <form action="/login" method="POST" style="margin:150px;">
           <!-- <label for="longURL">Enter a URL:</label> -->
