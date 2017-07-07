@@ -41,11 +41,14 @@ function generateRandomString() {
 
 var urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca",
-              userID: "abc123"},
+              userID: "abc123",
+              visits: 0},
   "Zq4Rt1": {longURL: "http://www.wired.com",
-              userID: "abc123"},
+              userID: "abc123",
+              visits: 50},
   "9sm5xK": {longURL: "http://www.google.com",
-              userID: "def456"}
+              userID: "def456",
+              visits: 200}
 };
 
 const users = {
@@ -216,7 +219,7 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   randomString = generateRandomString()
   // urlDatabase[randomString] = {"longURL": req.body.longURL, "userID": req.cookies["user_id"]}
-  urlDatabase[randomString] = {"longURL": req.body.longURL, "userID": req.session["user_id"]}
+  urlDatabase[randomString] = {"longURL": req.body.longURL, "userID": req.session["user_id"], "visits": 0}
   console.log(urlDatabase)
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
   res.redirect("http://localhost:8080/urls/" + randomString)
@@ -226,6 +229,7 @@ app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     res.status(404).send(`The short URL code you entered (${req.params.shortURL}) does not exist.  Please try again.`)
   }
+  urlDatabase[req.params.shortURL]["visits"] += 1
   let finalURL = urlDatabase[req.params.shortURL]["longURL"]
   console.log(finalURL)
   // res.render("u_new")
