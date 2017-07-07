@@ -1,11 +1,14 @@
 var express = require("express");
 // var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
+var methodOverride = require('method-override')
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(methodOverride('_method'))
 
 const bcrypt = require('bcrypt');
 
@@ -72,6 +75,10 @@ app.get("/urls.json", (req, res) => {
 
 
 app.get("/register", (req, res) => {
+  user = users[req.session.user_id]
+  if (user && user.id) {
+    res.redirect("/urls")
+  }
   // let templateVars = {
   //  user: users[req.cookies["user_id"]]
   // };
@@ -82,6 +89,7 @@ app.get("/register", (req, res) => {
 })
 
 app.post("/register", (req, res) => {
+
   console.log("POST SUCCESFUL")
 
   duplicateEmail = false
@@ -108,6 +116,10 @@ app.post("/register", (req, res) => {
 })
 
 app.get("/login", (req, res) => {
+  user = users[req.session.user_id]
+  if (user && user.id) {
+    res.redirect("/urls")
+  }
   let templateVars = {
    //user: users[req.cookies["user_id"]]
    user: users[req.session.user_id]
@@ -178,12 +190,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 })
 
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   urlDatabase[req.params.id]["longURL"] = req.body.newLongURL;
   // urlDatabase[req.params.id]["userID"] = req.cookies["user_id"]
   urlDatabase[req.params.id]["userID"] = req.session.user_id;

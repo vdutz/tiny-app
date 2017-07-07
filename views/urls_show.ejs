@@ -11,15 +11,15 @@
 <body>
     <% if (!user) { %>
 
-        <p>Please login or register first.</p>
+        <p>Please login or register.</p>
 
     <% } else if (urls[shortURL]["userID"] !== user["id"]) { %>
 
-        <p>The shortened code in the URL does not belong to you.</p>
+        <p>The selected short code that appears in the URL does not belong to you.</p>
 
     <% } else { %>
 
-    <h4> The selected URL has the following shortened code:</h4>
+    <h4> The selected URL has the following Short Link:</h4>
 
     <ul>
     <!-- Add your EJS code here -->
@@ -27,7 +27,7 @@
         <br>
         <% if (user && urls[shortURL]["userID"] == user["id"]) { %>
 
-            <form method="POST" action="/urls/<%= shortURL %>">
+            <form method="POST" action="/urls/<%= shortURL %>?_method=PUT">
               <input type="text" name="newLongURL" value="http://">
                 <input type="submit" value="Update this URL">
             </form>
@@ -35,9 +35,9 @@
         <% } %>
     </ul>
     <br>
-    <p>Click <a href="/urls">HERE</a> to see all your shortened URLs</p>
+    <p>Click here to <a href="/urls">See All Your Short Links</a>.</p>
     <br>
-    <p>Click <a href="/urls/new">HERE</a> to shorten a new URL</p>
+    <p>Click here to <a href="/urls/new">Create a New Short Link</a>.</p>
 
     <% } %>
 

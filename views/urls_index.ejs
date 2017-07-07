@@ -11,11 +11,11 @@
 <body>
     <% if (!user) { %>
 
-            <p>Please login or register first.</p>
+            <p>Please login or register.</p>
 
     <% } else { %>
 
-    <h4> Your current URLs and their shortened codes are listed below:</h4>
+    <h4> Your current URLs and their corresponding Short Links are listed below:</h4>
 
     <% if (!user) { %>
 
@@ -28,12 +28,12 @@
         <% for (key in urls) { %>
             <li><%= urls[key]["longURL"] %> - <%= key %></li>
             <br>
-            <form method="POST" action="/urls/<%= key %>/delete">
+            <form method="POST" action="/urls/<%= key %>/delete?_method=DELETE">
                 <% if (user && urls[key]["userID"] == user.id) { %>
 
-                    <a href="/urls/<%= key %>">Edit</a>
+                    <a href="/urls/<%= key %>">Edit this URL</a>
                     &nbsp; &nbsp; &nbsp;
-                    <input type="submit" value="Delete this URL shortener">
+                    <input type="submit" value="Delete this URL Short Link">
 
                 <% } %>
 
@@ -42,7 +42,7 @@
         <% }; %>
     </ul>
     <br>
-    <p>Click <a href="http://localhost:8080/urls/new">HERE</a> to shorten a new URL</p>
+    <p>Click here to <a href="http://localhost:8080/urls/new">Create a New Short Link</a>.</p>
 
     <% } %>
 
