@@ -19,11 +19,11 @@
 
     <% } else { %>
 
-    <h4> The selected URL has the following Short Link:</h4>
+    <h4> The selected URL is paired with the following Short Link:</h4>
 
     <ul>
     <!-- Add your EJS code here -->
-        <li><%= urls[shortURL]["longURL"] %> - <%= shortURL %></li>
+        <li><%= urls[shortURL]["longURL"] %> &nbsp;&nbsp;-->&nbsp;&nbsp; <a href="/u/<%= shortURL %>">http://localhost:8080/u/<%= shortURL %></a></li>
         <br>
         <% if (user && urls[shortURL]["userID"] == user["id"]) { %>
 
@@ -32,7 +32,23 @@
                 <input type="submit" value="Update this URL">
             </form>
             <br>
-            Short Link visits: <%= urls[shortURL]["visits"] %>
+            Short Link visits: <%= urls[shortURL]["visits"].length %>
+            <br>
+            Short Link unique visits: <%= urls[shortURL]["uniques"] %>
+            <br>
+            Short Link visit history:
+            <br><br>
+
+            <ol>
+
+            <% urls[shortURL]["visits"].forEach(function(item, index) { %>
+
+                <li>Visitor ID: &nbsp;&nbsp;&nbsp;<%= item["unique_id"] %><br>Timestamp: &nbsp;&nbsp;<%= item["timestamp"] %></li>
+                <br>
+
+            <% }) %>
+
+            </ul>
 
         <% } %>
     </ul>
