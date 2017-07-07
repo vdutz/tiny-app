@@ -1,5 +1,4 @@
 const express = require("express");
-// const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
 const bodyParser = require("body-parser");
@@ -14,26 +13,26 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(methodOverride('_method'));
 
-// app.use(cookieParser())
 app.use(cookieSession({
   name: 'session',
   keys: ['key1']
 }));
 
 const hashed_purple = bcrypt.hashSync("purple", 10);
-// console.log(hashed_purple);
 const hashed_blue = bcrypt.hashSync("blue", 10);
-// console.log(hashed_blue);
 
+
+// Function used for generating: (i) user IDs, and (ii) unique IDs to track unique link clicks
 function generateRandomString() {
   var myArray = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "G", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
   var myString = "";
-  for (i = 0; i < 6; i++) {
+  for (var i = 0; i < 6; i++) {
     myString += myArray[Math.floor(Math.random() * myArray.length)];
   }
   console.log(myString);
   return myString;
 }
+
 
 const urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca",
@@ -57,6 +56,7 @@ const urlDatabase = {
               uniques: 2}
 };
 
+
 const users = {
   "abc123": {
     id: "abc123",
@@ -72,34 +72,34 @@ const users = {
   }
 };
 
+
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+
 app.get("/register", (req, res) => {
-  user = users[req.session.user_id];
-  if (user && user.id) {
+  if (req.session.user_id) {
     res.redirect("/urls");
   }
-  // let templateVars = {
-  //  user: users[req.cookies["user_id"]]
-  // };
   let templateVars = {
    user: users[req.session["user_id"]]
   };
   res.render('register', templateVars);
 });
 
-app.post("/register", (req, res) => {
 
+app.post("/register", (req, res) => {
+  // Checks if email entered is already in the user database
   duplicateEmail = false;
   for (key in users) {
     if (users[key].email == req.body.email) {
@@ -109,40 +109,43 @@ app.post("/register", (req, res) => {
   if (duplicateEmail == true) {
     res.status(400).send("The email you entered already exists in our user database. Please refresh the page to try again.");
   }
+
+  // Checks if a blank password was entered
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send("The email or password you entered was blank.  Please refresh the page to try again.");
   }
 
-  randomID = generateRandomString();
-  // res.cookie('user_id', randomID)
+  // Generates a user ID
+  var randomID = generateRandomString();
   req.session.user_id = randomID;
 
-  uniqueID = "U-" + generateRandomString();
+  // Generates a unique ID (to keep track of unique link clicks)
+  var uniqueID = "U-" + generateRandomString();
   req.session["unique_id"] = uniqueID;
 
+  // Generates a new user object in the user database
   users[randomID] = {id: randomID, email: req.body.email, password: bcrypt.hashSync(req.body.password, 10), unique_id: uniqueID};
-  // console.log("TEST - PRINT USERS AFTER REGISTERING: \n\n", users)
 
   res.redirect("/urls");
-
 });
 
+
 app.get("/login", (req, res) => {
-  user = users[req.session.user_id];
-  if (user && user.id) {
+  if (req.session.user_id) {
     res.redirect("/urls");
   }
   let templateVars = {
-   //user: users[req.cookies["user_id"]]
    user: users[req.session.user_id]
   };
   res.render("login", templateVars);
 });
 
+
 app.post("/login", (req, res) => {
-  userID = "";
-  emailInUsers = false;
-  for (key in users) {
+  // Checks if email entered is in user database
+  var userID = "";
+  var emailInUsers = false;
+  for (var key in users) {
     if (users[key].email === req.body.email) {
       userID = key;
       emailInUsers = true;
@@ -151,15 +154,10 @@ app.post("/login", (req, res) => {
   if (!emailInUsers) {
     res.status(403).send("Your email address does not match our records.");
   } else {
-    //if (users[userID].password === req.body.password) {
+    // Checks if password entered matches hashed password in user database
     if (bcrypt.compareSync(req.body.password, users[userID].password)) {
-      //res.cookie('user_id', users[userID].id)
-      // if (!req.session["unique_id"]) {
-      //   uniqueID = "U-" + generateRandomString()
       req.session["unique_id"] = users[userID]["unique_id"];
-      // }
       req.session.user_id = users[userID].id;
-      // console.log("TEST - PRINT USERS AFTER LOGIN: \n\n", users);
       res.redirect("/urls");
     } else {
       res.status(403).send("Your password does not match your email address.");
@@ -167,15 +165,17 @@ app.post("/login", (req, res) => {
   }
 });
 
+
 app.post("/logout", (req, res) => {
-  // res.clearCookie('user_id')
   req.session = null;
   res.redirect("/urls");
 });
 
+
+// Function to return URLs filtered by user in order to render the /urls page with only the short links created by the user viewing it.
 function urlsForUser(id) {
-  filteredURLs = {};
-  for (key in urlDatabase) {
+  var filteredURLs = {};
+  for (var key in urlDatabase) {
     if (urlDatabase[key].userID == id) {
       filteredURLs[key] = urlDatabase[key];
     }
@@ -183,73 +183,76 @@ function urlsForUser(id) {
   return filteredURLs;
 };
 
+
 app.get("/urls", (req, res) => {
-  templateVars = {
-      // urls: urlsForUser(req.cookies["user_id"]),
+  let templateVars = {
       urls: urlsForUser(req.session.user_id),
-      // user: users[req.cookies["user_id"]]
       user: users[req.session.user_id]
     };
   res.render('urls_index', templateVars);
 });
 
+
 app.get("/urls/new", (req, res) => {
-  // if (!req.cookies["user_id"]) {
   if (!req.session.user_id) {
     res.redirect("/login");
   }
   let templateVars = {
-   // user: users[req.cookies["user_id"]]
    user: users[req.session.user_id]
   };
   res.render("urls_new", templateVars);
 });
+
 
 app.delete("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
 
+
 app.put("/urls/:id", (req, res) => {
   urlDatabase[req.params.id]["longURL"] = req.body.newLongURL;
-  // urlDatabase[req.params.id]["userID"] = req.cookies["user_id"]
   urlDatabase[req.params.id]["userID"] = req.session.user_id;
   res.redirect("/urls/" + req.params.id);
 });
 
+
 app.get("/urls/:id", (req, res) => {
+  // Checks to see if short code entered matches a record in user database
   if (!urlDatabase[req.params.id]) {
     res.status(404).send(`The short URL code you entered (${req.params.id}) does not exist.  Please try again.`);
   }
-  // let templateVars = { shortURL: req.params.id, urls: urlDatabase, user: users[req.cookies["user_id"]] };
-  let templateVars = { shortURL: req.params.id, urls: urlDatabase, user: users[req.session["user_id"]] };
-
+  let templateVars = { shortURL: req.params.id, urls: urlDatabase, user: users[req.session.user_id] };
   res.render("urls_show", templateVars);
 });
 
+
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  randomString = generateRandomString();
-  // urlDatabase[randomString] = {"longURL": req.body.longURL, "userID": req.cookies["user_id"]}
+  // Generates a short code for the URL entered
+  var randomString = generateRandomString();
   urlDatabase[randomString] = { "longURL": req.body.longURL,
-                                "userID": req.session["user_id"],
+                                "userID": req.session.user_id,
                                 "visits": [],
                                 "uniques": 0}
-  // console.log(urlDatabase)
-  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
   res.redirect("http://localhost:8080/urls/" + randomString)
 });
 
+
 app.get("/u/:shortURL", (req, res) => {
+  // Checks to see if short code entered matches a record in the database
   if (!urlDatabase[req.params.shortURL]) {
     res.status(404).send(`The short URL code you entered (${req.params.shortURL}) does not exist.  Please try again.`);
   }
+
+  // Checks to see if user already has a unique_id.  If not, one is created.
   if (!req.session["unique_id"]) {
-    uniqueID = "U-" + generateRandomString();
+    var uniqueID = "U-" + generateRandomString();
     req.session["unique_id"] = uniqueID;
   }
-  newHit = true;
-  visitLogs = urlDatabase[req.params.shortURL]["visits"];
+
+  // Increases the unique hit counter for the short URL if the user who clicked the short link has a unique_id that does not match any other unique_id in the "visits" log
+  var newHit = true;
+  var visitLogs = urlDatabase[req.params.shortURL]["visits"];
   visitLogs.forEach(function(item, index) {
     if(item.unique_id === req.session["unique_id"]) {
       newHit = false;
@@ -259,15 +262,17 @@ app.get("/u/:shortURL", (req, res) => {
     urlDatabase[req.params.shortURL]["uniques"] += 1;
   }
 
-  // console.log("TESTING NEW COOKIE ID: ", req.session["unique_id"])
-  a = new Date();
-  a.setHours(a.getHours() - 4);
-  timestamp = new Date(a);
+  // Creates a timestamp for each click of the short URL
+  var ts = new Date();
+  ts.setHours(ts.getHours() - 4);
+  var timestamp = new Date(ts);
   timestamp = timestamp.toString().replace("GMT+0000 (UTC)", "EST");
+
+  // Creates a log in the "visits" array when a user clicks a short link
   urlDatabase[req.params.shortURL]["visits"].push({unique_id: req.session["unique_id"], timestamp: timestamp});
-  console.log(urlDatabase);
-  console.log(urlDatabase[req.params.shortURL]["visits"]);
-  let finalURL = urlDatabase[req.params.shortURL]["longURL"];
+
+  // Redirects to the full URL that corresponds to the short link
+  var finalURL = urlDatabase[req.params.shortURL]["longURL"];
   res.redirect(302, finalURL);
 });
 
